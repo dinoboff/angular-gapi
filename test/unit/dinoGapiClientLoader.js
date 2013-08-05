@@ -31,14 +31,13 @@ describe('Service: dinoGapiClientLoader', function(){
     it('should call gapi.client.load', inject(function(dinoGapiClientLoader, $rootScope) {
         var apiName='your_api_name',
             apiVersion='v1',
-            root='http://foo.appspot.com/_ah/api',
-            cb;
+            root='http://foo.appspot.com/_ah/api';
 
         dinoGapiClientLoader({
             name: apiName,
             version: apiVersion,
             root: root
-        }, cb);
+        });
 
         $rootScope.$apply();
         expect(gapi.client.load.mostRecentCall.args[0]).toBe(apiName);
@@ -59,7 +58,7 @@ describe('Service: dinoGapiClientLoader', function(){
             name: apiName,
             version: apiVersion,
             root: root
-        }, cb);
+        }).then(cb);
 
         $rootScope.$apply();
         gapi.client.load.mostRecentCall.args[2](); // gapi.client.load is done and call the callback function

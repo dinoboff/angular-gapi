@@ -9,19 +9,22 @@ angular.module('dinoboff.gapi', []).
         
         return q.promise;
     }).
-    factory('dinoGapiClientLoader', function (dinoGapi, $rootScope) {
-        return function(apiDetails, cb) {
-            return dinoGapi.then(function(gapi){
+    factory('dinoGapiClientLoader', function (dinoGapi, $q, $rootScope) {
+        return function(apiDetails) {
+            var q = $q.defer();
+
+            dinoGapi.then(function(gapi){
                 gapi.client.load(
                     apiDetails.name,
                     apiDetails.version,
                     function () {
-                        cb(gapi);
+                        q.resolve(gapi);
                         $rootScope.$apply();
                     },
                     apiDetails.root
                 );
-                return gapi;
             });
+
+            return q.promise;
         };
     });
