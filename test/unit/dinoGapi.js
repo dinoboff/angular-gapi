@@ -29,7 +29,7 @@ describe('Service: dinoGapi', function(){
         expect(components).toContain('client');
     }));
 
-    it('should return a promise that resolve to gapi', inject(function(dinoGapi, $rootScope) {
+    it('should return a promise that resolve to gapi', inject(function(dinoGapi) {
         var loadCb = gapi.load.mostRecentCall.args[1],
             resolvedValue;
 
@@ -38,7 +38,6 @@ describe('Service: dinoGapi', function(){
         });
 
         loadCb();
-        $rootScope.$apply();
 
         expect(resolvedValue).toBe(gapi);
     }));

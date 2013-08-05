@@ -13,7 +13,7 @@ describe('Service: dinoGapiClientLoader', function(){
             $provide.value('dinoGapi', gapiPromise);
         });
 
-        inject(function($q) {
+        inject(function($q, $rootScope) {
             var d = $q.defer();
 
             gapi = {
@@ -23,6 +23,7 @@ describe('Service: dinoGapiClientLoader', function(){
             gapiPromise.then.andCallFake(d.promise.then);
 
             d.resolve(gapi);
+            $rootScope.$apply();
         });
     });
 
@@ -60,7 +61,7 @@ describe('Service: dinoGapiClientLoader', function(){
             root: root
         }, cb);
 
-        $rootScope.$apply(); // deliver promises
+        $rootScope.$apply();
         gapi.client.load.mostRecentCall.args[2](); // gapi.client.load is done and call the callback function
         expect(loadedApi).toBe(gapi);
     }));
