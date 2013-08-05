@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Angular gapi example</title>
+	<script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+	<script type="text/javascript" src="/bower_components/angular/angular.js"></script>
+	<script type="text/javascript" src="/bower_components/angular-gapi/service.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('gapiExample', ['dinoboff.gapi']);
+
+		app.filter('formatDate', function(){
+			return function (date) {
+				var d = new Date(date);
+				
+				return d.toLocaleTimeString();
+			};
+		});
+
+		app.controller('GuestbookCtrl', function ($scope, $timeout, dinoGapiClientLoader) {
+			var gapi,
+				apiDetails={
+					name: 'guestbook',
+					version: 'v1',
+					root: 'http://localhost:8080/_ah/api'
+				},
+				updateTimer;
+
+			// Flag to disable the new message form
+			$scope.disabled = true;
+
+
+			// Method to update the list of message.
+			// 
+			// Query the server for messages and set timer to repeat
+			// the query every 5s
+			$scope.list = function () {
+				if (updateTimer) {
+					$timeout.cancel(updateTimer);
+				}
+
+				gapi.client.guestbook.messages.list().execute(function(resp) {
+					
+					if (resp.result && resp.result.messages) {
+						$scope.messages = resp.result.messages;
+						$scope.$apply();
+					}
+
+					// should us google app engine channel instead
+					updateTimer = $timeout($scope.list, 5000);
+				});
+			};
+
+			// Method to insert a new message.
+			// 
+			// Update the list of message after a insert
+			$scope.insert = function() {
+				if(!gapi) {
+					return;
+				}
+				
+				message = {
+					"createdAt" : new Date(),
+					"createdBy" : $scope.createdBy,
+					"content" : $scope.content
+				};
+
+				$scope.disabled = true;
+				gapi.client.guestbook.messages.insert(message).execute(function(){
+					$scope.disabled = false;
+					$scope.content = "";
+					$scope.list();
+				});
+			};
+
+			// Load the google end point client
+			// 
+			// enable creation of new message, and load existing message
+			// when the client is ready.
+			dinoGapiClientLoader(apiDetails).then(function (loadedApi) {
+				gapi = loadedApi;
+				$scope.disabled = false;
+				$scope.list();
+			});
+		});
+
+	</script>
+</head>
+<body ng-app="gapiExample">
+	<div ng-controller="GuestbookCtrl">
+		<h2>Guestbook</h2>
+		<form ng-submit="insert()">
+			<p><input type="text" ng-model="createdBy" size="50" placeholder="Your name"></p>
+			<p><input type="text" ng-model="content" size="50" placeholder="Your message"></p>
+			<p><input type="submit" class="btn" value="Post" ng-disabled="disabled"></p>
+		</form>
+
+		<ul>
+			<li ng-repeat="message in messages">
+				[{{message.createdAt|formatDate}}] -  
+				{{message.createdBy}}: 
+				{{message.content}}
+			</li>
+		</ul>
+	</div>
+</body>
+</html>

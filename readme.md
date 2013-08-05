@@ -13,26 +13,7 @@ Bower component for loading gapi.client, gapi.auth and Google Cloud endpoints ja
 
 ## Usage
 
-```javascript
-function CtrlExample($scope, dinoGapiClientLoader) {
-	var gapi;
-	
-	$scope.backendReady = false;
-	$scope.results = [];
-	dinoGapiClientLoader({
-			name: 'some_api_name',
-			version: 'v1',
-			root: 'https://some-app.appspot.com/_ah/api'
-		},
-		function(readyApi){
-			gapi = readyApi;
-			$scope.results = gapi.client.some.rpc.call();
-			$scope.backendReady = true;
-			$scope.$apply();
-		}
-	);
-}
-```
+See `example/static/index.html`
 
 
 ## License
