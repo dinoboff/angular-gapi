@@ -7,6 +7,15 @@
 	<script type="text/javascript" src="/bower_components/angular-gapi/service.js"></script>
 	<script type="text/javascript">
 		var app = angular.module('gapiExample', ['dinoboff.gapi']);
+		
+		app.run(function($rootScope, dinoGapiClientLoader) {
+				// not that $scope.gapi will on be a promise
+				$rootScope.gapi = dinoGapiClientLoader({
+					name: 'guestbook',
+					version: 'v1',
+					root: 'http://localhost:8080/_ah/api'
+				});
+			});
 
 		app.filter('formatDate', function(){
 			return function (date) {
@@ -18,16 +27,10 @@
 
 		app.controller('GuestbookCtrl', function ($scope, $timeout, dinoGapiClientLoader) {
 			var gapi,
-				apiDetails={
-					name: 'guestbook',
-					version: 'v1',
-					root: 'http://localhost:8080/_ah/api'
-				},
 				updateTimer;
 
 			// Flag to disable the new message form
 			$scope.disabled = true;
-
 
 			// Method to update the list of message.
 			// 
@@ -76,7 +79,7 @@
 			// 
 			// enable creation of new message, and load existing message
 			// when the client is ready.
-			dinoGapiClientLoader(apiDetails).then(function (loadedApi) {
+			$scope.gapi.then(function (loadedApi) {
 				gapi = loadedApi;
 				$scope.disabled = false;
 				$scope.list();
