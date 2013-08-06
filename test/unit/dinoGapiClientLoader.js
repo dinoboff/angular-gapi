@@ -2,67 +2,70 @@
 
 
 describe('Service: dinoGapiClientLoader', function(){
-	var gapiPromise, gapi;
-
-    beforeEach(function(){
-        module('dinoboff.gapi');
-
-        module(function($provide) {
-            gapiPromise = jasmine.createSpyObj('promise', ['then']);
-
-            $provide.value('dinoGapi', gapiPromise);
-        });
-
-        inject(function($q, $rootScope) {
-            var d = $q.defer();
-
-            gapi = {
-                'client': jasmine.createSpyObj('client', ['load'])
-            };
-
-            gapiPromise.then.andCallFake(d.promise.then);
-
-            d.resolve(gapi);
-            $rootScope.$apply();
-        });
-    });
+    var gapi;
 
 
-    it('should call gapi.client.load', inject(function(dinoGapiClientLoader, $rootScope) {
-        var apiName='your_api_name',
-            apiVersion='v1',
-            root='http://foo.appspot.com/_ah/api';
+    beforeEach(module('dinoboff.gapi'));
 
-        dinoGapiClientLoader({
-            name: apiName,
-            version: apiVersion,
-            root: root
-        });
-
-        $rootScope.$apply();
-        expect(gapi.client.load.mostRecentCall.args[0]).toBe(apiName);
-        expect(gapi.client.load.mostRecentCall.args[1]).toBe(apiVersion);
-        expect(gapi.client.load.mostRecentCall.args[3]).toBe(root);
+    beforeEach(inject(function($window) {
+        // mock gapi.load
+        gapi = $window.gapi = jasmine.createSpyObj('gapi', ['load']);
+        gapi.client = jasmine.createSpyObj('client', ['load']);
+    }));
+	
+    it('should load auth and client library', inject(function(dinoGapiClientLoader) {
+        dinoGapiClientLoader();
+        expect(gapi.load.mostRecentCall.args[0]).toBe('auth:client');
     }));
 
-    it('should send gapi to the loader callback', inject(function(dinoGapiClientLoader, $rootScope) {
-        var apiName='your_api_name',
-            apiVersion='v1',
-            root='http://foo.appspot.com/_ah/api',
-            loadedApi,
-            cb=function (gapi) {
-                loadedApi = gapi;
-            };
+    it('should load google endpoint', inject(function(dinoGapiClientLoader) {
+        var apiDetails={
+            name: 'guestbook',
+            version: 'v1',
+            root: 'http://localhost:8080/_ah/api'
+        };
 
-        dinoGapiClientLoader({
-            name: apiName,
-            version: apiVersion,
-            root: root
-        }).then(cb);
+        dinoGapiClientLoader(apiDetails);
 
-        $rootScope.$apply();
-        gapi.client.load.mostRecentCall.args[2](); // gapi.client.load is done and call the callback function
-        expect(loadedApi).toBe(gapi);
+        gapi.load.mostRecentCall.args[1](); // similate gapi loaded and cb called
+        expect(gapi.client.load.mostRecentCall.args[0]).toBe(apiDetails.name);
+        expect(gapi.client.load.mostRecentCall.args[1]).toBe(apiDetails.version);
+        expect(gapi.client.load.mostRecentCall.args[3]).toBe(apiDetails.root);
+
     }));
 
+    it('should not try to load a endpoint if no details are given', inject(function(dinoGapiClientLoader) {
+        dinoGapiClientLoader();
+        gapi.load.mostRecentCall.args[1](); // similate gapi loaded and cb called
+
+        expect(gapi.client.load).not.toHaveBeenCalled();
+    }));
+
+    it('should return a promise resolving to gapi', inject(function(dinoGapiClientLoader) {
+        var p = dinoGapiClientLoader(), resolvedValue;
+
+        expect(p.then).toBeDefined();
+
+        p.then(function (gapi) {
+            resolvedValue = gapi;
+        });
+
+        gapi.load.mostRecentCall.args[1](); // similate gapi loaded and cb called
+        expect(resolvedValue).toBe(gapi);
+    }));
+
+    it('should return a promise resolving to gapi when loading an endpoint', inject(function(dinoGapiClientLoader) {
+        var p = dinoGapiClientLoader({name: 'guestbook'}), resolvedValue;
+
+        expect(p.then).toBeDefined();
+
+        p.then(function (gapi) {
+            resolvedValue = gapi;
+        });
+
+        gapi.load.mostRecentCall.args[1](); // similate gapi loaded and cb called
+        gapi.client.load.mostRecentCall.args[2]();
+        expect(resolvedValue).toBe(gapi);
+    }));
+    
 });
