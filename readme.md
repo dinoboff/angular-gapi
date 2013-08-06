@@ -18,3 +18,10 @@ See `example/static/index.html`
 
 ## License
 BSD
+
+
+## References
+
+* Google App Engine, https://developers.google.com/appengine/
+* AngularJS, http://angularjs.org/
+* Cloud Endpoints, https://developers.google.com/appengine/docs/python/endpoints/
