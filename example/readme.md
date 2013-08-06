@@ -1,6 +1,6 @@
 # Angular-gapi demo
 
-Python implement of https://cloud.google.com/resources/articles/angularjs-cloud-endpoints-recipe-for-building-modern-web-applications
+Python implementation of https://cloud.google.com/resources/articles/angularjs-cloud-endpoints-recipe-for-building-modern-web-applications
 
 ## Install
 
