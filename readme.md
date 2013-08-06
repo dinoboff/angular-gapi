@@ -8,7 +8,7 @@ Bower component for loading gapi.client, gapi.auth and Google Cloud endpoints ja
 3. Include `https://apis.google.com/js/api.js`
 4. Add `dinoboff.gapi` as a module dependency to your app.
 
-`dinoGapi` and `dinoGapiClientLoader` services are now available.
+`dinoGapiClientLoader` services are now available.
 
 
 ## Usage
