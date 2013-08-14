@@ -9,7 +9,7 @@
 		var app = angular.module('gapiExample', ['dinoboff.gapi']);
 		
 		app.run(function($rootScope, dinoGapiClientLoader) {
-				// not that $scope.gapi will on be a promise
+				// note that $scope.gapi will only be a promise
 				$rootScope.gapi = dinoGapiClientLoader({
 					name: 'guestbook',
 					version: 'v1',
