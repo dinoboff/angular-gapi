@@ -10,6 +10,21 @@ Bower component for loading gapi.client, gapi.auth and Google Cloud endpoints ja
 
 `dinoGapiClientLoader` services are now available.
 
+### bower.json:
+```javascript
+{
+  "name": "YourCoolProject",
+  "description": "A great thing",
+  "version": "0.0.1",
+  "homepage": "http://www.example.org",
+  "license": "GPL",
+  "private": false,
+  "dependencies": {
+    "dinoboff-angular-gapi": "dinoboff/angular-gapi#0.3.0",
+  }
+}
+
+```
 
 ## Usage
 
